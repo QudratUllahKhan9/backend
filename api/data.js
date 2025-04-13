@@ -1,17 +1,24 @@
-import connectMongo from '../utils/connectMongo.js';
-import Data from '../models/Data.js';
+import mongoose from 'mongoose';
+import Data from '../models/Data';  // Import your Data model
 
 export default async function handler(req, res) {
-  const { id } = req.query;
+  // Only handle GET requests
+  if (req.method === 'GET') {
+    try {
+      const { id } = req.query;  // Get the ID from the query params (e.g., /api/data?id=2467270621)
+      const data = await Data.findOne({ id });  // Query the database for that ID
 
-  try {
-    await connectMongo();
-    const data = await Data.findOne({ id });
-
-    if (!data) return res.status(404).json({ message: 'Not found' });
-
-    res.status(200).json(data);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+      if (data) {
+        return res.status(200).json(data);  // Return the data if found
+      } else {
+        return res.status(404).json({ message: "❌ No data found with this ID." });
+      }
+    } catch (error) {
+      console.error("❌ Error fetching data:", error);
+      return res.status(500).json({ message: "❌ Internal Server Error" });
+    }
+  } else {
+    // Handle non-GET requests
+    return res.status(405).json({ message: "❌ Method Not Allowed" });
   }
 }

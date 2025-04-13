@@ -15,4 +15,5 @@ const DataSchema = new mongoose.Schema({
   trainer: String
 });
 
+// Ensure that the model is created only once, to avoid overwriting it in a hot-reloading environment
 export default mongoose.models.Data || mongoose.model('Data', DataSchema);
